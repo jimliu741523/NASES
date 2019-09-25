@@ -27,7 +27,7 @@ def model_fn(actions, addFilter):
         skip_rate = 5
         a = np.where(abs(skip_list - skip_list[k])<skip_rate)[0]
         connect_list.append(a[a!= k])
-    print(connect_list)
+#     print(connect_list)
     ip = Input(shape=(32, 32, 3))   
     x = ip
     k = 0

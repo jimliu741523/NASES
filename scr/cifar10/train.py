@@ -9,7 +9,6 @@ def run(process,embedding, origin_len, addFilter):
     from keras.preprocessing.image import ImageDataGenerator
     from keras.datasets import cifar10
 
-
     from model import model_fn
     from DNNcoder import DNNcoder as coder
     
@@ -17,16 +16,15 @@ def run(process,embedding, origin_len, addFilter):
     import matplotlib.pyplot as plt
     mpl.use('Agg')
     
-
     import tensorflow as tf
+    from tensorflow.python.keras.applications.resnet50 import preprocess_input  
+    
     import random
-    import heapq
     from contextlib import redirect_stdout
     import numpy as np
     import pickle
     import gc
     from sklearn import preprocessing
-    from tensorflow.python.keras.applications.resnet50 import preprocess_input
     import six
     import sys
     from utils import random_crop, crop_generator, center_crop, crop_generator_center, m_images_pad, principal_components, zca_whitening, MyCallback, SGDRScheduler
@@ -43,8 +41,8 @@ def run(process,embedding, origin_len, addFilter):
     num_data = 10
 
     for i in range(num_data):
-      foo = [i for i in range(1, 30)]*4
-      simulation_sequence.append(random.sample(foo, origin_len))
+        foo = [i for i in range(1, 30)]*4
+        simulation_sequence.append(random.sample(foo, origin_len))
 
     simulation_sequence = np.reshape(simulation_sequence,[num_data, origin_len])
     s = random.sample(range(simulation_sequence.shape[0]),1)
@@ -116,9 +114,7 @@ def run(process,embedding, origin_len, addFilter):
         test_generator = ts_datagen.flow(x_test, y_test, batch_size=batch_size)        
 
         test_crops = crop_generator_center(test_generator, 32)    
-
-
-            
+         
             
     # kernel_1, filters_1, skip_connect
     total_val_acc = []
@@ -156,7 +152,7 @@ def run(process,embedding, origin_len, addFilter):
             print("===Come back to best action===")
 
 
-        print("Parameter:",np.reshape(action_in,[-1,4]))
+#         print("Parameter:",np.reshape(action_in,[-1,4]))
 
 
 
@@ -168,7 +164,7 @@ def run(process,embedding, origin_len, addFilter):
         DNNcoder.restore()
    
         from controller import controller  
-        print('==========',episodesCount,'===========')
+#         print('==========',episodesCount,'===========')
         if episodesCount % 30 == 0:
             pre_init = DNNcoder.show_weight(np.reshape(action_in,[1,-1]))
             controller = controller(pre_init, origin_len=origin_len, embedding=embedding)
@@ -205,7 +201,7 @@ def run(process,embedding, origin_len, addFilter):
 
         controller.save()
         code = controller.preds(state = np.reshape(action_in,[1,-1]))
-        print(code)
+#         print(code)
 
             
             
@@ -261,8 +257,8 @@ def run(process,embedding, origin_len, addFilter):
 
            #load best model
             model.load_weights("../scr/cifar10/finalModel/best_weights.hdf5")
-#             reward =  (val_acc  -  (tr_acc - val_acc))**3
-            reward =  val_acc**3 
+            reward =  (val_acc  -  (tr_acc - val_acc))**3
+#             reward =  val_acc**3 
 
             total_val_acc.append(val_acc)
             total_reward.append(reward)
@@ -289,26 +285,25 @@ def run(process,embedding, origin_len, addFilter):
             model.load_weights("../scr/cifar10/finalModel/best_weights.hdf5")
 
 
-            #
         test_acc = model.evaluate_generator(test_crops, 10000 / batch_size)[1]
         loss = model.evaluate_generator(test_crops, 10000 / batch_size)[0]
         total_test_acc.append(test_acc)
 
         if search:
             if val_acc == max(total_val_acc):
-               plot_model(model, to_file='../scr/cifar10/result/model_graph.png')
-               with open('../scr/cifar10/result/modelsummary.txt', 'w') as f:
-                    with redirect_stdout(f):
-                         model.summary()
+                plot_model(model, to_file='../scr/cifar10/result/model_graph.png')
+                with open('../scr/cifar10/result/modelsummary.txt', 'w') as f:
+                     with redirect_stdout(f):
+                            model.summary()
 
-               with open('../scr/cifar10/result/best_acc.txt', 'w') as f:
-                    with redirect_stdout(f):
-                         print(i,"val_acc:",val_acc,"test_acc:",test_acc)
+                with open('../scr/cifar10/result/best_acc.txt', 'w') as f:
+                     with redirect_stdout(f):
+                            print(i,"val_acc:",val_acc,"test_acc:",test_acc)
 
-               with open('../scr/cifar10/result/best_action', 'wb') as fp:
-                   pickle.dump(np.reshape(action_in,[1,-1]), fp)
+                with open('../scr/cifar10/result/best_action', 'wb') as fp:
+                     pickle.dump(np.reshape(action_in,[1,-1]), fp)
 
-               print("=====================================Model Save - Best====================================")  
+                print("=====================================Model Save - Best====================================")  
 
 
             print(i,"accuracy_val:",val_acc,"accuracy_test:",test_acc,"reward:",re_total_reward[-1],'model_loss:',loss,"control_loss:",loss_control)
@@ -328,13 +323,11 @@ def run(process,embedding, origin_len, addFilter):
             plot_model(model, to_file='model_graph.png')
             with open('../scr/cifar10/result/modelsummary.txt', 'w') as f:
                  with redirect_stdout(f):
-                      model.summary()
+                        model.summary()
 
             with open('../scr/cifar10/result/best_acc.txt', 'w') as f:
                  with redirect_stdout(f):
-                      print("test_acc:",val_acc,test_acc)
+                        print("test_acc:",val_acc,test_acc)
 
             sys.exit()        
 
-if __name__ == '__main__':
-    main()

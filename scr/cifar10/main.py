@@ -27,6 +27,5 @@ def main(_):
         RUN(process,embedding, origin_len, addFilter)
         
         
- 
 if __name__ == '__main__':
     tf.app.run()
